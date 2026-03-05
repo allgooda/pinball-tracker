@@ -1,4 +1,4 @@
-import { Machine } from '../types';
+import type { Machine } from '../types';
 
 interface Props {
   machines: Machine[];
