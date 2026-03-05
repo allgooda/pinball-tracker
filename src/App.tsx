@@ -1,8 +1,11 @@
+// src/App.tsx
+
 import { useState } from 'react';
 import type { Machine, ScoreEntry } from './types';
 import { calculateStats } from './utils/stats';
 import MachineSwitcher from './components/MachineSwitch';
 import StatsRow from './components/StatsRow';
+import AddScoreForm from './components/AddScoreForm';
 
 const initialMachines: Machine[] = [
   { id: 1, name: 'Black Hole' },
@@ -18,10 +21,15 @@ const initialScores: ScoreEntry[] = [
 
 export default function App() {
   const [machines] = useState<Machine[]>(initialMachines);
-  const [scores] = useState<ScoreEntry[]>(initialScores);
+  const [scores, setScores] = useState<ScoreEntry[]>(initialScores);
   const [activeMachine, setActiveMachine] = useState<Machine>(initialMachines[0]);
+
   const activeScores = scores.filter((s) => s.machine.id === activeMachine.id);
   const stats = calculateStats(activeScores);
+
+  function handleAddScore(entry: ScoreEntry) {
+    setScores((prev) => [...prev, entry]);
+  }
 
   return (
     <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32 }}>
@@ -34,9 +42,10 @@ export default function App() {
         onSelect={setActiveMachine}
       />
       {stats && <StatsRow stats={stats} />}
-      <p style={{ color: '#a08040', fontFamily: 'Georgia, serif', marginTop: 24 }}>
-        Active machine: {activeMachine.name}
-      </p>
+      <AddScoreForm
+        activeMachine={activeMachine}
+        onAdd={handleAddScore}
+      />
     </div>
   );
 }
