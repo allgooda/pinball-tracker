@@ -1,4 +1,4 @@
-import { ScoreEntry, MachineStats } from "../types";
+import type { ScoreEntry, MachineStats } from "../types";
 import { MILESTONES } from "../data/constants";
 
 export function sum(values: number[]): number {
