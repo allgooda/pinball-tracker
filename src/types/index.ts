@@ -2,7 +2,7 @@ export interface ScoreEntry{
     id: number;
     score: number;
     date: string;
-    machine: string;
+    machine: Machine;
 }
 
 export interface MachineStats {
@@ -16,5 +16,9 @@ export interface MachineStats {
     milestoneHits: Record<number, number>;
 }
 
-export type ScoreMap = Record<string, ScoreEntry[]>;
+export interface Machine {
+    id: number;
+    name: string;
+}
+export type ScoreMap = Record<number, ScoreEntry[]>;
 
