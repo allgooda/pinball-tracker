@@ -6,6 +6,7 @@ import { calculateStats } from './utils/stats';
 import MachineSwitcher from './components/MachineSwitch';
 import StatsRow from './components/StatsRow';
 import AddScoreForm from './components/AddScoreForm';
+import ScoreList from './components/ScoreList';
 
 const initialMachines: Machine[] = [
   { id: 1, name: 'Black Hole' },
@@ -20,6 +21,7 @@ const initialScores: ScoreEntry[] = [
 ];
 
 export default function App() {
+
   const [machines] = useState<Machine[]>(initialMachines);
   const [scores, setScores] = useState<ScoreEntry[]>(initialScores);
   const [activeMachine, setActiveMachine] = useState<Machine>(initialMachines[0]);
@@ -31,21 +33,38 @@ export default function App() {
     setScores((prev) => [...prev, entry]);
   }
 
+  function handleRemoveScore(id: number) {
+    setScores((prev) => prev.filter((s) => s.id !== id));
+  }
+
   return (
     <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32 }}>
+
       <h1 style={{ color: '#f0c84a', fontFamily: 'Georgia, serif' }}>
         Pinball Tracker
       </h1>
+
       <MachineSwitcher
         machines={machines}
         activeMachine={activeMachine}
         onSelect={setActiveMachine}
       />
+
       {stats && <StatsRow stats={stats} />}
+
       <AddScoreForm
         activeMachine={activeMachine}
         onAdd={handleAddScore}
       />
+
+      {stats && (
+        <ScoreList
+          scores={activeScores}
+          stats={stats}
+          onRemove={handleRemoveScore}
+        />
+      )}
+
     </div>
   );
 }
