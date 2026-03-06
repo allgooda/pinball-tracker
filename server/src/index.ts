@@ -1,10 +1,7 @@
-// index.ts
-// express server with routes for machines and scores
-
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import db from './db';
+import pool, { initDb } from './db';
 import type { MachineRow, ScoreRow, AddMachineBody, AddScoreBody } from './types';
 
 const app = express();
@@ -16,63 +13,75 @@ app.use(express.json());
 
 // --- machines ---
 
-app.get('/machines', (req: Request, res: Response) => {
-  const machines = db.prepare('SELECT * FROM machines').all() as MachineRow[];
-  res.json(machines);
+app.get('/machines', async (req: Request, res: Response) => {
+  const result = await pool.query<MachineRow>('SELECT * FROM machines');
+  res.json(result.rows);
 });
 
-app.post('/machines', (req: Request<{}, {}, AddMachineBody>, res: Response) => {
+app.post('/machines', async (req: Request<{}, {}, AddMachineBody>, res: Response) => {
   const { name } = req.body;
   if (!name) {
     res.status(400).json({ error: 'name is required' });
     return;
   }
-  const result = db.prepare('INSERT INTO machines (name) VALUES (?)').run(name);
-  res.json({ id: result.lastInsertRowid, name });
+  const result = await pool.query<MachineRow>(
+    'INSERT INTO machines (name) VALUES ($1) RETURNING *',
+    [name]
+  );
+  res.json(result.rows[0]);
 });
 
-app.delete('/machines/:id', (req: Request<{ id: string }>, res: Response) => {
+app.delete('/machines/:id', async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  db.prepare('DELETE FROM scores WHERE machine_id = ?').run(id);
-  db.prepare('DELETE FROM machines WHERE id = ?').run(id);
+  await pool.query('DELETE FROM scores WHERE machine_id = $1', [id]);
+  await pool.query('DELETE FROM machines WHERE id = $1', [id]);
   res.json({ success: true });
 });
 
 
 // --- scores ---
 
-app.get('/scores', (req: Request<{}, {}, {}, { machineId?: string }>, res: Response) => {
+app.get('/scores', async (req: Request<{}, {}, {}, { machineId?: string }>, res: Response) => {
   const { machineId } = req.query;
-  const scores = machineId
-    ? db.prepare('SELECT * FROM scores WHERE machine_id = ?').all(machineId) as ScoreRow[]
-    : db.prepare('SELECT * FROM scores').all() as ScoreRow[];
-  res.json(scores);
+  const result = machineId
+    ? await pool.query<ScoreRow>('SELECT * FROM scores WHERE machine_id = $1', [machineId])
+    : await pool.query<ScoreRow>('SELECT * FROM scores');
+  res.json(result.rows);
 });
 
-app.post('/scores', (req: Request<{}, {}, AddScoreBody>, res: Response) => {
+app.post('/scores', async (req: Request<{}, {}, AddScoreBody>, res: Response) => {
   const { score, date, machineId } = req.body;
   if (!score || !date || !machineId) {
     res.status(400).json({ error: 'score, date and machineId are required' });
     return;
   }
-  const result = db.prepare(
-    'INSERT INTO scores (score, date, machine_id) VALUES (?, ?, ?)'
-  ).run(score, date, machineId);
-  res.json({ id: result.lastInsertRowid, score, date, machineId });
+  const result = await pool.query<ScoreRow>(
+    'INSERT INTO scores (score, date, machine_id) VALUES ($1, $2, $3) RETURNING *',
+    [score, date, machineId]
+  );
+  res.json(result.rows[0]);
 });
 
-app.delete('/scores/:id', (req: Request<{ id: string }>, res: Response) => {
+app.delete('/scores/:id', async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  db.prepare('DELETE FROM scores WHERE id = ?').run(id);
+  await pool.query('DELETE FROM scores WHERE id = $1', [id]);
   res.json({ success: true });
 });
 
 
-app.listen(PORT, () => {
-  console.log(`server running on http://localhost:${PORT}`);
-}).on('error', (err) => {
-  console.error('server error:', err);
-});
+// start server after db is ready
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`server running on http://localhost:${PORT}`);
+    }).on('error', (err) => {
+      console.error('server error:', err);
+    });
+  })
+  .catch((err) => {
+    console.error('failed to initialize database:', err);
+    process.exit(1);
+  });
 
 process.on('uncaughtException', (err) => {
   console.error('uncaught exception:', err);

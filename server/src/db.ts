@@ -1,33 +1,29 @@
 // db.ts
-// sets up the sqlite database and creates tables if they don't exist yet
+// sets up the postgresql connection and creates tables if they don't exist yet
 
-import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
+import { Pool } from 'pg';
 
-const dbDir = process.env.DB_DIR ?? path.join(__dirname, '../../data');
-const dbPath = path.join(dbDir, 'pinball.db');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production'
+    ? { rejectUnauthorized: false }
+    : false,
+});
 
-// create the data directory if it doesn't exist
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+export async function initDb(): Promise<void> {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS machines (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS scores (
+      id SERIAL PRIMARY KEY,
+      score INTEGER NOT NULL,
+      date TEXT NOT NULL,
+      machine_id INTEGER NOT NULL REFERENCES machines(id)
+    );
+  `);
 }
 
-const db = new Database(dbPath);
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS machines (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS scores (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    score INTEGER NOT NULL,
-    date TEXT NOT NULL,
-    machine_id INTEGER NOT NULL,
-    FOREIGN KEY (machine_id) REFERENCES machines (id)
-  );
-`);
-
-export default db;
+export default pool;
