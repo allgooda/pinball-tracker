@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import type { Machine, ScoreEntry } from '../types';
+import { toScoreId } from '../types';
+
+function getLocalDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  console.log(`${year}-${month}-${day}`);
+  return `${year}-${month}-${day}`;
+}
 
 interface Props {
   activeMachine: Machine;
@@ -8,7 +18,7 @@ interface Props {
 
 export default function AddScoreForm({ activeMachine, onAdd }: Props) {
   const [score, setScore] = useState<string>('');
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState<string>(getLocalDate());
   const [error, setError] = useState<string>('');
   const [added, setAdded] = useState<boolean>(false);
 
@@ -20,7 +30,7 @@ export default function AddScoreForm({ activeMachine, onAdd }: Props) {
     }
 
     const entry: ScoreEntry = {
-      id: Date.now(),
+      id: toScoreId(Date.now()),
       score: parsed,
       date,
       machine: activeMachine,

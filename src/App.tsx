@@ -4,13 +4,15 @@
 import { useState, useEffect } from 'react';
 import type { Machine, ScoreEntry, ScoreId } from './types';
 import { calculateStats } from './utils/stats';
-import { fetchMachines, fetchScores, addScore, deleteScore } from './utils/api';
-import MachineSwitcher from './components/MachineSwitch';
+import { fetchMachines, fetchScores, addScore, deleteScore, addMachine } from './utils/api';
+import MachineSwitcher from './components/MachineSwitcher';
 import StatsRow from './components/StatsRow';
 import AddScoreForm from './components/AddScoreForm';
+import AddMachineForm from './components/AddMachineForm';
 import ScoreList from './components/ScoreList';
 import MilestoneTracker from './components/MilestoneTracker';
 import ScoreChart from './components/ScoreChart';
+import { toDisplayScoreEntries } from './utils/display';
 
 export default function App() {
 
@@ -50,18 +52,16 @@ export default function App() {
     setActiveMachine(machine);
   }
 
+  async function handleAddMachine(machine: Machine) {
+    const saved = await addMachine(machine.name);
+    setMachines((prev) => [...prev, saved]);
+    setActiveMachine(saved);
+  }
+
   if (loading) {
     return (
       <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32, color: '#806030', fontFamily: 'Georgia, serif' }}>
         loading...
-      </div>
-    );
-  }
-
-  if (machines.length === 0) {
-    return (
-      <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32, color: '#806030', fontFamily: 'Georgia, serif' }}>
-        no machines found — add one to get started
       </div>
     );
   }
@@ -79,11 +79,14 @@ export default function App() {
         Pinball Tracker
       </h1>
 
-      <MachineSwitcher
-        machines={machines}
-        activeMachine={activeMachine!}
-        onSelect={handleSelectMachine}
-      />
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 24 }}>
+        <MachineSwitcher
+          machines={machines}
+          activeMachine={activeMachine!}
+          onSelect={handleSelectMachine}
+        />
+        <AddMachineForm onAdd={handleAddMachine} />
+      </div>
 
       {stats && <StatsRow stats={stats} />}
 
@@ -105,7 +108,7 @@ export default function App() {
 
       {stats && (
         <ScoreList
-          scores={activeScores}
+          scores={toDisplayScoreEntries(activeScores)}
           stats={stats}
           onRemove={handleRemoveScore}
         />
