@@ -1,19 +1,19 @@
 // src/components/ScoreList.tsx
 
-import type { ScoreEntry, MachineStats } from '../types';
+import type { ScoreEntry, MachineStats, ScoreId} from '../types';
 import { formatScore, formatDate } from '../utils/format';
 
 interface Props {
   scores: ScoreEntry[];
   stats: MachineStats;
-  onRemove: (id: number) => void;
+  onRemove: (id: ScoreId) => void;
 }
 
 function ScoreRow({ entry, isHigh, isLow, onRemove }: {
   entry: ScoreEntry;
   isHigh: boolean;
   isLow: boolean;
-  onRemove: (id: number) => void;
+  onRemove: (id: ScoreId) => void;
 }) {
   return (
     <div style={{
