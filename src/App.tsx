@@ -13,6 +13,7 @@ import ScoreList from './components/ScoreList';
 import MilestoneTracker from './components/MilestoneTracker';
 import ScoreChart from './components/ScoreChart';
 import { toDisplayScoreEntries } from './utils/display';
+import FloorChart from './components/FloorChart';
 
 export default function App() {
 
@@ -79,7 +80,7 @@ export default function App() {
         Pinball Tracker
       </h1>
 
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 24 }}>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 24, flexWrap: 'wrap' }}>
         <MachineSwitcher
           machines={machines}
           activeMachine={activeMachine!}
@@ -99,6 +100,9 @@ export default function App() {
         />
       )}
 
+      {activeScores.length >= 4 && (
+        <FloorChart scores={activeScores} />
+      )}
       {activeMachine && (
         <AddScoreForm
           activeMachine={activeMachine}

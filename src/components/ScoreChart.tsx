@@ -1,12 +1,39 @@
 // ScoreChart.tsx
-// bar chart of scores over time with a rolling average line
+// bar chart of scores over time with rolling average, median and floor trend lines
 
 import type { ScoreEntry, MachineStats } from '../types';
-import { rollingAverage } from '../utils/stats';
+import { rollingAverage, runningMedian, runningFloor } from '../utils/stats';
 
 interface Props {
   scores: ScoreEntry[];
   stats: MachineStats;
+}
+
+interface LineProps {
+  points: number[];
+  max: number;
+  chartH: number;
+  gap: number;
+  color: string;
+  dash?: string;
+  opacity?: number;
+}
+
+function TrendLine({ points, max, chartH, gap, color, dash, opacity = 1 }: LineProps) {
+  const path = points
+    .map((val, i) => `${i * gap + 30},${chartH - (val / max) * chartH}`)
+    .join(' ');
+
+  return (
+    <polyline
+      points={path}
+      fill="none"
+      stroke={color}
+      strokeWidth={1.5}
+      strokeDasharray={dash}
+      opacity={opacity}
+    />
+  );
 }
 
 export default function ScoreChart({ scores, stats }: Props) {
@@ -18,6 +45,8 @@ export default function ScoreChart({ scores, stats }: Props) {
   );
 
   const rolling = rollingAverage(sorted);
+  const medians = runningMedian(sorted);
+  const floors = runningFloor(sorted);
 
   const chartH = 120;
   const barW = 28;
@@ -72,23 +101,45 @@ export default function ScoreChart({ scores, stats }: Props) {
           })}
 
           {/* rolling average line */}
-          <polyline
-            points={rolling.map((avg, i) => `${i * gap + 30},${chartH - (avg / stats.high) * chartH}`).join(' ')}
-            fill="none"
-            stroke="#f0c84a"
-            strokeWidth={1.5}
-            strokeDasharray="4 3"
+          <TrendLine
+            points={rolling}
+            max={stats.high}
+            chartH={chartH}
+            gap={gap}
+            color="#f0c84a"
+            dash="4 3"
             opacity={0.6}
+          />
+
+          {/* running median line */}
+          <TrendLine
+            points={medians}
+            max={stats.high}
+            chartH={chartH}
+            gap={gap}
+            color="#60a0d0"
+            opacity={0.8}
+          />
+
+          {/* running floor line */}
+          <TrendLine
+            points={floors}
+            max={stats.high}
+            chartH={chartH}
+            gap={gap}
+            color="#804020"
+            dash="2 2"
+            opacity={0.8}
           />
 
         </svg>
 
-        <div style={{ fontSize: 10, color: '#604820', marginTop: 4 }}>
-          <span style={{ color: '#f0c84a', marginRight: 6 }}>— —</span> 5-game rolling average
-          &nbsp;&nbsp;
-          <span style={{ color: '#f0c84a' }}>█</span> high
-          &nbsp;&nbsp;
-          <span style={{ color: '#804020' }}>█</span> low
+        <div style={{ fontSize: 10, color: '#604820', marginTop: 4, display: 'flex', gap: 16 }}>
+          <span><span style={{ color: '#f0c84a' }}>— —</span> rolling avg</span>
+          <span><span style={{ color: '#60a0d0' }}>——</span> median</span>
+          <span><span style={{ color: '#804020' }}>- -</span> floor</span>
+          <span><span style={{ color: '#f0c84a' }}>█</span> high</span>
+          <span><span style={{ color: '#804020' }}>█</span> low</span>
         </div>
 
       </div>

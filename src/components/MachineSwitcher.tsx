@@ -8,7 +8,7 @@ interface Props {
 
 export default function MachineSwitcher({ machines, activeMachine, onSelect }: Props) {
   return (
-    <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+    <div style={{ display: 'flex', gap: 10 }}>
       {machines.map((machine) => (
         <button
           key={machine.id}
