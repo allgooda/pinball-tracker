@@ -12,7 +12,6 @@ export default function AddMachineForm({ onAdd }: Props) {
 
   const [name, setName] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [added, setAdded] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
   function handleSubmit() {
@@ -26,9 +25,7 @@ export default function AddMachineForm({ onAdd }: Props) {
     onAdd({ id: 0 as any, name: name.trim() });
     setName('');
     setError('');
-    setAdded(true);
     setOpen(false);
-    setTimeout(() => setAdded(false), 1500);
   }
 
   if (!open) {
