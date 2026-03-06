@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import type { Machine, ScoreEntry } from '../types';
-import { toScoreId } from '../types';
+import type { Machine } from '../types';
+import type { DisplayScoreEntry } from '../utils/display';
+import { toDisplayScoreId } from '../utils/display';
+import { formatScore, formatDate } from '../utils/format';
 
 function getLocalDate(): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  console.log(`${year}-${month}-${day}`);
   return `${year}-${month}-${day}`;
 }
 
 interface Props {
   activeMachine: Machine;
-  onAdd: (entry: ScoreEntry) => void;
+  onAdd: (entry: DisplayScoreEntry) => void;
 }
 
 export default function AddScoreForm({ activeMachine, onAdd }: Props) {
@@ -29,11 +30,13 @@ export default function AddScoreForm({ activeMachine, onAdd }: Props) {
       return;
     }
 
-    const entry: ScoreEntry = {
-      id: toScoreId(Date.now()),
-      score: parsed,
-      date,
-      machine: activeMachine,
+    const entry: DisplayScoreEntry = {
+      id: toDisplayScoreId(''),
+      formattedScore: formatScore(parsed),
+      formattedDate: formatDate(date),
+      rawScore: parsed,
+      rawDate: date,
+      machineName: activeMachine.name,
     };
 
     onAdd(entry);

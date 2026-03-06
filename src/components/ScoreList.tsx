@@ -1,20 +1,20 @@
 // ScoreList.tsx
 // shows all games for the active machine, newest first
 
-import type { ScoreId, MachineStats } from '../types';
-import type { DisplayScoreEntry } from '../utils/display';
+import type { MachineStats } from '../types';
+import type { DisplayScoreEntry, DisplayScoreId } from '../utils/display';
 
 interface Props {
   scores: DisplayScoreEntry[];
   stats: MachineStats;
-  onRemove: (id: ScoreId) => void;
+  onRemove: (id: DisplayScoreId) => void;
 }
 
 interface RowProps {
   entry: DisplayScoreEntry;
   isHigh: boolean;
   isLow: boolean;
-  onRemove: (id: ScoreId) => void;
+  onRemove: (id: DisplayScoreId) => void;
 }
 
 function ScoreRow({ entry, isHigh, isLow, onRemove }: RowProps) {

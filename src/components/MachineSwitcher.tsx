@@ -5,7 +5,7 @@ import type { Machine } from '../types';
 
 interface Props {
   machines: Machine[];
-  activeMachine: Machine;
+  activeMachine: Machine | null;
   onSelect: (machine: Machine) => void;
   onDelete: (machine: Machine) => void;
 }
@@ -110,10 +110,10 @@ export default function MachineSwitcher({ machines, activeMachine, onSelect, onD
             style={{
               display: 'flex',
               alignItems: 'center',
-              background: activeMachine.id === machine.id
+              background: activeMachine?.id === machine.id
                 ? 'rgba(240,200,74,0.18)'
                 : 'rgba(255,255,255,0.04)',
-              border: activeMachine.id === machine.id
+              border: activeMachine?.id === machine.id
                 ? '1px solid rgba(240,200,74,0.6)'
                 : '1px solid rgba(255,255,255,0.1)',
               borderRadius: 6,
@@ -126,7 +126,7 @@ export default function MachineSwitcher({ machines, activeMachine, onSelect, onD
                 background: 'none',
                 border: 'none',
                 padding: '9px 16px',
-                color: activeMachine.id === machine.id ? '#f0c84a' : '#806030',
+                color: activeMachine?.id === machine.id ? '#f0c84a' : '#806030',
                 fontSize: 14,
                 cursor: 'pointer',
                 fontFamily: 'Georgia, serif',

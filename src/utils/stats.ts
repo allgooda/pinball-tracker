@@ -20,7 +20,6 @@ export function median(values: number[]): number {
 export function floor(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   const bottomCount = Math.max(1, Math.ceil(values.length * 0.25));
-  console.log('floor sorted:', sorted, 'taking bottom:', bottomCount, 'slice:', sorted.slice(0, bottomCount));
   const bottom = sorted.slice(0, bottomCount);
   return average(bottom);
 }
@@ -70,7 +69,6 @@ export function rollingAverage(scores: ScoreEntry[], window: number = 5): number
 export function calculateStats(scores: ScoreEntry[]): MachineStats | null {
   if (scores.length === 0) return null;
   const values = scores.map((s) => s.score);
-  console.log('values:', values, 'floor:', floor(values));
   return {
     count: values.length,
     average: average(values),
@@ -95,7 +93,6 @@ export function runningFloor(scores: ScoreEntry[]): number[] {
   const chronological = sortByDate(scores);
   return chronological.map((_, i) => {
     const slice = chronological.slice(0, i + 1).map((s) => s.score);
-    console.log('slice:', slice, 'floor:', floor(slice));
     return floor(slice);
   });
 }

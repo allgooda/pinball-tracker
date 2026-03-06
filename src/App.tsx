@@ -2,7 +2,9 @@
 // root component, manages global state and data fetching
 
 import { useState, useEffect } from 'react';
-import type { Machine, ScoreEntry, ScoreId } from './types';
+import type { Machine, ScoreEntry } from './types';
+import { toScoreId } from './types';
+import type { DisplayScoreEntry, DisplayScoreId } from './utils/display';
 import { calculateStats } from './utils/stats';
 import { fetchMachines, fetchScores, addScore, deleteScore, addMachine, deleteMachine } from './utils/api';
 import MachineSwitcher from './components/MachineSwitcher';
@@ -34,19 +36,20 @@ export default function App() {
   // load scores whenever active machine changes
   useEffect(() => {
     if (!activeMachine) return;
-    fetchScores(activeMachine.id).then((data) => {
+    fetchScores(activeMachine).then((data) => {
       setScores(data);
     });
   }, [activeMachine]);
 
-  async function handleAddScore(entry: ScoreEntry) {
-    const saved = await addScore(entry.score, entry.date, entry.machine);
+  async function handleAddScore(entry: DisplayScoreEntry) {
+    if (!activeMachine) return;
+    const saved = await addScore(entry.rawScore, entry.rawDate, activeMachine);
     setScores((prev) => [...prev, saved]);
   }
 
-  async function handleRemoveScore(id: ScoreId) {
-    await deleteScore(id);
-    setScores((prev) => prev.filter((s) => s.id !== id));
+  async function handleRemoveScore(id: DisplayScoreId) {
+    await deleteScore(toScoreId(Number(id)));
+    setScores((prev) => prev.filter((s) => String(s.id) !== id));
   }
 
   async function handleSelectMachine(machine: Machine) {
@@ -61,9 +64,10 @@ export default function App() {
 
   async function handleDeleteMachine(machine: Machine) {
     await deleteMachine(machine.id);
-    setMachines((prev) => prev.filter((m) => m.id !== machine.id));
+    const remaining = machines.filter((m) => m.id !== machine.id);
+    setMachines(remaining);
     if (activeMachine?.id === machine.id) {
-      setActiveMachine(machines[0] ?? null);
+      setActiveMachine(remaining[0] ?? null);
     }
   }
 
@@ -91,7 +95,7 @@ export default function App() {
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 24, flexWrap: 'wrap' }}>
         <MachineSwitcher
           machines={machines}
-          activeMachine={activeMachine!}
+          activeMachine={activeMachine}
           onSelect={handleSelectMachine}
           onDelete={handleDeleteMachine}
         />
