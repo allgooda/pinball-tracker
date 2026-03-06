@@ -8,6 +8,7 @@ import StatsRow from './components/StatsRow';
 import AddScoreForm from './components/AddScoreForm';
 import ScoreList from './components/ScoreList';
 import MilestoneTracker from './components/MilestoneTracker';
+import ScoreChart from './components/ScoreChart';
 
 const initialMachines: Machine[] = [
   { id: 1, name: 'Black Hole' },
@@ -53,7 +54,12 @@ export default function App() {
 
       {stats && <StatsRow stats={stats} />}
       {stats && <MilestoneTracker stats={stats} />}
-
+      {stats && (
+        <ScoreChart
+          scores={activeScores}
+          stats={stats}
+        />
+      )}
       <AddScoreForm
         activeMachine={activeMachine}
         onAdd={handleAddScore}
