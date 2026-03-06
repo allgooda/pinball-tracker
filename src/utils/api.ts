@@ -3,7 +3,7 @@
 
 import { type Machine, type ScoreEntry, type MachineId, type ScoreId, toScoreId, toMachineId } from '../types';
 
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
 export async function fetchMachines(): Promise<Machine[]> {
   const res = await fetch(`${BASE_URL}/machines`);

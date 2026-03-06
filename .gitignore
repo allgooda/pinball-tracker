@@ -25,3 +25,4 @@ dist-ssr
 data/
 server/dist/
 server/.env
+.env
