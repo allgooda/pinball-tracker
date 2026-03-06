@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import type { Machine, ScoreEntry, ScoreId } from './types';
 import { calculateStats } from './utils/stats';
-import { fetchMachines, fetchScores, addScore, deleteScore, addMachine } from './utils/api';
+import { fetchMachines, fetchScores, addScore, deleteScore, addMachine, deleteMachine } from './utils/api';
 import MachineSwitcher from './components/MachineSwitcher';
 import StatsRow from './components/StatsRow';
 import AddScoreForm from './components/AddScoreForm';
@@ -59,6 +59,14 @@ export default function App() {
     setActiveMachine(saved);
   }
 
+  async function handleDeleteMachine(machine: Machine) {
+    await deleteMachine(machine.id);
+    setMachines((prev) => prev.filter((m) => m.id !== machine.id));
+    if (activeMachine?.id === machine.id) {
+      setActiveMachine(machines[0] ?? null);
+    }
+  }
+
   if (loading) {
     return (
       <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32, color: '#806030', fontFamily: 'Georgia, serif' }}>
@@ -85,6 +93,7 @@ export default function App() {
           machines={machines}
           activeMachine={activeMachine!}
           onSelect={handleSelectMachine}
+          onDelete={handleDeleteMachine}
         />
         <AddMachineForm onAdd={handleAddMachine} />
       </div>
