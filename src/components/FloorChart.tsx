@@ -88,17 +88,26 @@ export default function FloorChart({ scores }: Props) {
           />
 
           {/* dots at each data point */}
-          {floors.map((val, i) => (
+        {floors.map((val, i) => (
+        <g key={i}>
             <circle
-              key={i}
-              cx={i * gap + 30}
-              cy={toY(val)}
-              r={3}
-              fill="#804020"
-              opacity={0.9}
+            cx={i * gap + 30}
+            cy={toY(val)}
+            r={3}
+            fill="#804020"
+            opacity={0.9}
             />
-          ))}
-
+            <text
+            x={i * gap + 30}
+            y={toY(val) - 8}
+            textAnchor="middle"
+            fontSize={9}
+            fill="#a06040"
+            >
+            {formatScore(val)}
+            </text>
+        </g>
+        ))}
           {/* date labels */}
           {sorted.map((entry, i) => (
             <text
