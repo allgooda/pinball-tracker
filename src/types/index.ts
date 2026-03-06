@@ -1,5 +1,5 @@
 export interface ScoreEntry{
-    id: number;
+    id: ScoreId;
     score: number;
     date: string;
     machine: Machine;
@@ -17,8 +17,19 @@ export interface MachineStats {
 }
 
 export interface Machine {
-    id: number;
+    id: MachineId;
     name: string;
 }
 export type ScoreMap = Record<number, ScoreEntry[]>;
 
+export type MachineId = number & { readonly __brand: 'MachineId' };
+export type ScoreId = number & { readonly __brand: 'ScoreId' };
+
+// helper functions to create branded ids
+export function toMachineId(id: number): MachineId {
+  return id as MachineId;
+}
+
+export function toScoreId(id: number): ScoreId {
+  return id as ScoreId;
+}
