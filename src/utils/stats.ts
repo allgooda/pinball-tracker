@@ -25,6 +25,20 @@ export function floor(values: number[]): number {
   return average(bottom);
 }
 
+export function dailyFloor(scores: ScoreEntry[]): { date: string; floor: number }[] {
+  const chronological = sortByDate(scores);
+
+  // get unique dates in order
+  const dates = [...new Set(chronological.map((s) => s.date))];
+
+  return dates.map((date) => {
+    // all scores up to and including this date
+    const upToDate = chronological.filter((s) => s.date <= date);
+    const values = upToDate.map((s) => s.score);
+    return { date, floor: floor(values) };
+  });
+}
+
 export function sortByDate(scores: ScoreEntry[]): ScoreEntry[] {
   return [...scores].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
