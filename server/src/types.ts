@@ -22,3 +22,22 @@ export interface AddScoreBody {
   date: string;
   machineId: number;
 }
+
+export interface MachineStats {
+  count: number;
+  average: number;
+  median: number;
+  high: number;
+  low: number;
+  floor: number;
+  trend: number;
+  milestoneHits: Record<number, number>;
+  rollingAverage: number[];
+  dailyFloor: { date: string; floor: number }[];
+}
+
+export interface Machine {
+  id: number;
+  name: string;
+  stats: MachineStats | null;
+}
