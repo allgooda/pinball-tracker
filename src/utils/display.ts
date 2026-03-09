@@ -1,7 +1,7 @@
 // display.ts
 // converts raw data types into display-ready types with formatting applied
 
-import type { ScoreEntry } from '../types';
+import { toScoreId, type ScoreEntry, type ScoreId } from '../types';
 import { formatScore, formatDate } from './format';
 
 export type DisplayScoreId = string & { readonly __brand: 'DisplayScoreId' };
@@ -10,6 +10,9 @@ export function toDisplayScoreId(id: string): DisplayScoreId {
   return id as DisplayScoreId;
 }
 
+export function fromDisplayScoreId(entry: DisplayScoreId): ScoreId {
+  return toScoreId(Number(entry));
+}
 export interface DisplayScoreEntry {
   id: DisplayScoreId;
   formattedScore: string;

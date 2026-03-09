@@ -2,11 +2,12 @@
 // bar chart of scores over time with rolling average line
 
 import { useState } from 'react';
-import type { ScoreEntry, MachineStats } from '../types';
+import { toMachineId, type MachineStats } from '../types';
+import { fromDisplayScoreId, type DisplayScoreEntry } from '../utils/display';
 import { rollingAverage } from '../utils/stats';
 
 interface Props {
-  scores: ScoreEntry[];
+  scores: DisplayScoreEntry[];
   stats: MachineStats;
 }
 
@@ -44,10 +45,17 @@ export default function ScoreChart({ scores, stats }: Props) {
   if (scores.length < 2) return null;
 
   const sorted = [...scores].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    (a, b) => new Date(a.formattedDate).getTime() - new Date(b.formattedDate).getTime()
   );
 
-  const rolling = rollingAverage(sorted);
+  const rolling = rollingAverage(
+    sorted.map(e => ({
+      id: fromDisplayScoreId(e.id),
+      score: e.rawScore,
+      date: e.rawDate,
+      machine: { id: toMachineId(0), name: e.machineName },
+    }))
+  );
 
   const chartH = 120;
   const barW = 28;
@@ -91,17 +99,17 @@ export default function ScoreChart({ scores, stats }: Props) {
             ))}
 
             {sorted.map((entry, i) => {
-              const h = Math.max(4, (entry.score / stats.high) * chartH);
+              const h = Math.max(4, (Number(entry.formattedScore) / stats.high) * chartH);
               const x = i * gap + 16;
-              const isHigh = entry.score === stats.high;
-              const isLow = entry.score === stats.low;
+              const isHigh = Number(entry.formattedScore) === stats.high;
+              const isLow = Number(entry.formattedScore) === stats.low;
               const fill = isHigh ? '#f0c84a' : isLow ? '#804020' : 'rgba(192,160,96,0.55)';
 
               return (
                 <g key={entry.id}>
                   <rect x={x} y={chartH - h} width={barW} height={h} fill={fill} rx={3} />
                   <text x={x + barW / 2} y={chartH + 16} textAnchor="middle" fontSize={9} fill="#604820">
-                    {entry.date.slice(5)}
+                    {entry.formattedDate.slice(5)}
                   </text>
                 </g>
               );
