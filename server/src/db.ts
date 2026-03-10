@@ -13,7 +13,8 @@ export async function initDb(): Promise<void> {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS machines (
       id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL
+      name TEXT NOT NULL,
+      user_id TEXT NOT NULL DEFAULT ''
     );
 
     CREATE TABLE IF NOT EXISTS scores (
@@ -22,6 +23,11 @@ export async function initDb(): Promise<void> {
       date TEXT NOT NULL,
       machine_id INTEGER NOT NULL REFERENCES machines(id)
     );
+  `);
+
+  // migration: add user_id to existing machines table if missing
+  await pool.query(`
+    ALTER TABLE machines ADD COLUMN IF NOT EXISTS user_id TEXT NOT NULL DEFAULT '';
   `);
 }
 

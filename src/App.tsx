@@ -2,6 +2,7 @@
 // root component, manages global state and data fetching
 
 import { useState, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import type { Machine, ScoreEntry } from './types';
 import { fromDisplayScoreId } from './utils/display';
 import type { DisplayScoreEntry, DisplayScoreId } from './utils/display';
@@ -19,41 +20,50 @@ import MedianChart from './components/MedianChart';
 
 export default function App() {
 
+  const { isLoading, isAuthenticated, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
+
   const [machines, setMachines] = useState<Machine[]>([]);
   const [scores, setScores] = useState<ScoreEntry[]>([]);
   const [activeMachine, setActiveMachine] = useState<Machine | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // load machines on mount
+  // load machines on mount once authenticated
   useEffect(() => {
-    fetchMachines().then((data) => {
-      setMachines(data);
-      if (data.length > 0) setActiveMachine(data[0]);
-      setLoading(false);
-    });
-  }, []);
+    if (!isAuthenticated) return;
+    getAccessTokenSilently().then((token) =>
+      fetchMachines(token).then((data) => {
+        setMachines(data);
+        if (data.length > 0) setActiveMachine(data[0]);
+        setLoading(false);
+      })
+    );
+  }, [isAuthenticated]);
 
   // load scores and stats whenever active machine changes
   useEffect(() => {
     if (!activeMachine) return;
-    fetchScores(activeMachine).then((data) => setScores(data));
-    fetchMachine(activeMachine.id).then((data) => setActiveMachine(data));
+    getAccessTokenSilently().then((token) => {
+      fetchScores(activeMachine, token).then((data) => setScores(data));
+      fetchMachine(activeMachine.id, token).then((data) => setActiveMachine(data));
+    });
   }, [activeMachine?.id]);
 
   async function handleAddScore(entry: DisplayScoreEntry) {
     if (!activeMachine) return;
-    const saved = await addScore(entry.rawScore, entry.rawDate, activeMachine);
+    const token = await getAccessTokenSilently();
+    const saved = await addScore(entry.rawScore, entry.rawDate, activeMachine, token);
     setScores((prev) => [...prev, saved]);
-    const updated = await fetchMachine(activeMachine.id);
+    const updated = await fetchMachine(activeMachine.id, token);
     setActiveMachine(updated);
     setMachines((prev) => prev.map((m) => m.id === updated.id ? updated : m));
   }
 
   async function handleRemoveScore(id: DisplayScoreId) {
     if (!activeMachine) return;
-    await deleteScore(fromDisplayScoreId(id));
+    const token = await getAccessTokenSilently();
+    await deleteScore(fromDisplayScoreId(id), token);
     setScores((prev) => prev.filter((s) => String(s.id) !== id));
-    const updated = await fetchMachine(activeMachine.id);
+    const updated = await fetchMachine(activeMachine.id, token);
     setActiveMachine(updated);
     setMachines((prev) => prev.map((m) => m.id === updated.id ? updated : m));
   }
@@ -63,18 +73,52 @@ export default function App() {
   }
 
   async function handleAddMachine(machine: Machine) {
-    const saved = await addMachine(machine.name);
+    const token = await getAccessTokenSilently();
+    const saved = await addMachine(machine.name, token);
     setMachines((prev) => [...prev, saved]);
     setActiveMachine(saved);
   }
 
   async function handleDeleteMachine(machine: Machine) {
-    await deleteMachine(machine.id);
+    const token = await getAccessTokenSilently();
+    await deleteMachine(machine.id, token);
     const remaining = machines.filter((m) => m.id !== machine.id);
     setMachines(remaining);
     if (activeMachine?.id === machine.id) {
       setActiveMachine(remaining[0] ?? null);
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32, color: '#806030', fontFamily: 'Georgia, serif' }}>
+        loading...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <h1 style={{ color: '#f0c84a', fontFamily: 'Georgia, serif', marginBottom: 32 }}>Pinball Tracker</h1>
+        <button
+          onClick={() => loginWithRedirect()}
+          style={{
+            background: 'rgba(192,160,96,0.2)',
+            border: '1px solid rgba(192,160,96,0.5)',
+            borderRadius: 6,
+            padding: '12px 32px',
+            color: '#f0c84a',
+            fontSize: 16,
+            cursor: 'pointer',
+            fontFamily: 'Georgia, serif',
+            letterSpacing: 1,
+          }}
+        >
+          log in
+        </button>
+      </div>
+    );
   }
 
   if (loading) {
@@ -94,9 +138,26 @@ export default function App() {
   return (
     <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32 }}>
 
-      <h1 style={{ color: '#f0c84a', fontFamily: 'Georgia, serif' }}>
-        Pinball Tracker
-      </h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ color: '#f0c84a', fontFamily: 'Georgia, serif' }}>
+          Pinball Tracker
+        </h1>
+        <button
+          onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+          style={{
+            background: 'none',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 6,
+            padding: '6px 16px',
+            color: '#604820',
+            fontSize: 12,
+            cursor: 'pointer',
+            fontFamily: 'Georgia, serif',
+          }}
+        >
+          log out
+        </button>
+      </div>
 
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 24, flexWrap: 'wrap' }}>
         <MachineSwitcher
@@ -126,6 +187,7 @@ export default function App() {
       {stats && stats.dailyMedian.length >= 4 && (
         <MedianChart stats={stats} />
       )}
+
       {activeMachine && (
         <AddScoreForm
           activeMachine={activeMachine}

@@ -4,6 +4,7 @@
 export interface MachineRow {
   id: number;
   name: string;
+  user_id: string;
 }
 
 export interface ScoreRow {
