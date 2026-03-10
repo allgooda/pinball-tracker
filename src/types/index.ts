@@ -16,6 +16,7 @@ export interface MachineStats {
     milestoneHits: Record<number, number>;
     rollingAverage: number[];
     dailyFloor: { date: string; floor: number }[];
+  dailyMedian: { date: string; median: number }[];
 }
 
 export interface Machine {

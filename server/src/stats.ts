@@ -64,6 +64,15 @@ function dailyFloor(scores: ScoreRow[]): { date: string; floor: number }[] {
   });
 }
 
+function dailyMedian(scores: ScoreRow[]): { date: string; median: number }[] {
+  const chronological = sortByDate(scores);
+  const dates = [...new Set(chronological.map(s => s.date))];
+  return dates.map(date => {
+    const upToDate = chronological.filter(s => s.date <= date);
+    return { date, median: median(upToDate.map(s => s.score)) };
+  });
+}
+
 export function calculateStats(scores: ScoreRow[]): MachineStats | null {
   if (scores.length === 0) return null;
   const values = scores.map(s => s.score);
@@ -78,5 +87,6 @@ export function calculateStats(scores: ScoreRow[]): MachineStats | null {
     milestoneHits: milestoneHits(values),
     rollingAverage: rollingAverage(scores),
     dailyFloor: dailyFloor(scores),
+    dailyMedian: dailyMedian(scores),
   };
 }

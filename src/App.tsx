@@ -15,6 +15,7 @@ import MilestoneTracker from './components/MilestoneTracker';
 import ScoreChart from './components/ScoreChart';
 import { toDisplayScoreEntries } from './utils/display';
 import FloorChart from './components/FloorChart';
+import MedianChart from './components/MedianChart';
 
 export default function App() {
 
@@ -120,6 +121,10 @@ export default function App() {
 
       {stats && stats.dailyFloor.length >= 4 && (
         <FloorChart stats={stats} />
+      )}
+
+      {stats && stats.dailyMedian.length >= 4 && (
+        <MedianChart stats={stats} />
       )}
       {activeMachine && (
         <AddScoreForm
