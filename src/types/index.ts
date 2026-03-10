@@ -14,11 +14,14 @@ export interface MachineStats {
     floor: number;
     trend: number;
     milestoneHits: Record<number, number>;
+    rollingAverage: number[];
+    dailyFloor: { date: string; floor: number }[];
 }
 
 export interface Machine {
     id: MachineId;
     name: string;
+    stats: MachineStats | null;
 }
 export type ScoreMap = Record<number, ScoreEntry[]>;
 

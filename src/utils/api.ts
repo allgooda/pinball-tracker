@@ -9,10 +9,14 @@ export async function fetchMachines(): Promise<Machine[]> {
   const res = await fetch(`${BASE_URL}/machines`);
   if (!res.ok) throw new Error(`Failed to fetch machines: ${res.status}`);
   const raw = await res.json();
-  return raw.map((m: any) => ({
-    id: toMachineId(m.id),
-    name: m.name,
-  }));
+  return raw.map((m: any) => ({ id: toMachineId(m.id), name: m.name, stats: null }));
+}
+
+export async function fetchMachine(id: MachineId): Promise<Machine> {
+  const res = await fetch(`${BASE_URL}/machines/${id}`);
+  if (!res.ok) throw new Error(`Failed to fetch machine: ${res.status}`);
+  const m = await res.json();
+  return { id: toMachineId(m.id), name: m.name, stats: m.stats };
 }
 
 export async function addMachine(name: string): Promise<Machine> {
@@ -23,7 +27,7 @@ export async function addMachine(name: string): Promise<Machine> {
   });
   if (!res.ok) throw new Error(`Failed to add machine: ${res.status}`);
   const data = await res.json();
-  return { id: toMachineId(data.id), name: data.name };
+  return { id: toMachineId(data.id), name: data.name, stats: null };
 }
 
 export async function deleteMachine(id: MachineId): Promise<void> {

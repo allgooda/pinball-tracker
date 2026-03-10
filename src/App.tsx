@@ -3,10 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import type { Machine, ScoreEntry } from './types';
-import { toScoreId } from './types';
+import { fromDisplayScoreId } from './utils/display';
 import type { DisplayScoreEntry, DisplayScoreId } from './utils/display';
-import { calculateStats } from './utils/stats';
-import { fetchMachines, fetchScores, addScore, deleteScore, addMachine, deleteMachine } from './utils/api';
+import { fetchMachines, fetchMachine, fetchScores, addScore, deleteScore, addMachine, deleteMachine } from './utils/api';
 import MachineSwitcher from './components/MachineSwitcher';
 import StatsRow from './components/StatsRow';
 import AddScoreForm from './components/AddScoreForm';
@@ -33,23 +32,29 @@ export default function App() {
     });
   }, []);
 
-  // load scores whenever active machine changes
+  // load scores and stats whenever active machine changes
   useEffect(() => {
     if (!activeMachine) return;
-    fetchScores(activeMachine).then((data) => {
-      setScores(data);
-    });
-  }, [activeMachine]);
+    fetchScores(activeMachine).then((data) => setScores(data));
+    fetchMachine(activeMachine.id).then((data) => setActiveMachine(data));
+  }, [activeMachine?.id]);
 
   async function handleAddScore(entry: DisplayScoreEntry) {
     if (!activeMachine) return;
     const saved = await addScore(entry.rawScore, entry.rawDate, activeMachine);
     setScores((prev) => [...prev, saved]);
+    const updated = await fetchMachine(activeMachine.id);
+    setActiveMachine(updated);
+    setMachines((prev) => prev.map((m) => m.id === updated.id ? updated : m));
   }
 
   async function handleRemoveScore(id: DisplayScoreId) {
-    await deleteScore(toScoreId(Number(id)));
+    if (!activeMachine) return;
+    await deleteScore(fromDisplayScoreId(id));
     setScores((prev) => prev.filter((s) => String(s.id) !== id));
+    const updated = await fetchMachine(activeMachine.id);
+    setActiveMachine(updated);
+    setMachines((prev) => prev.map((m) => m.id === updated.id ? updated : m));
   }
 
   async function handleSelectMachine(machine: Machine) {
@@ -83,7 +88,7 @@ export default function App() {
     ? scores.filter((s) => s.machine.id === activeMachine.id)
     : [];
 
-  const stats = activeMachine ? calculateStats(activeScores) : null;
+  const stats = activeMachine?.stats ?? null;
 
   return (
     <div style={{ background: '#0d0a05', minHeight: '100vh', padding: 32 }}>
@@ -108,13 +113,13 @@ export default function App() {
 
       {stats && (
         <ScoreChart
-          scores={activeScores}
+          scores={toDisplayScoreEntries(activeScores)}
           stats={stats}
         />
       )}
 
-      {activeScores.length >= 4 && (
-        <FloorChart scores={activeScores} />
+      {stats && stats.dailyFloor.length >= 4 && (
+        <FloorChart stats={stats} />
       )}
       {activeMachine && (
         <AddScoreForm

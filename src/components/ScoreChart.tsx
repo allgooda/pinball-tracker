@@ -2,9 +2,8 @@
 // bar chart of scores over time with rolling average line
 
 import { useState } from 'react';
-import { toMachineId, type MachineStats } from '../types';
-import { fromDisplayScoreId, type DisplayScoreEntry } from '../utils/display';
-import { rollingAverage } from '../utils/stats';
+import type { MachineStats } from '../types';
+import type { DisplayScoreEntry } from '../utils/display';
 
 interface Props {
   scores: DisplayScoreEntry[];
@@ -45,17 +44,10 @@ export default function ScoreChart({ scores, stats }: Props) {
   if (scores.length < 2) return null;
 
   const sorted = [...scores].sort(
-    (a, b) => new Date(a.formattedDate).getTime() - new Date(b.formattedDate).getTime()
+    (a, b) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime()
   );
 
-  const rolling = rollingAverage(
-    sorted.map(e => ({
-      id: fromDisplayScoreId(e.id),
-      score: e.rawScore,
-      date: e.rawDate,
-      machine: { id: toMachineId(0), name: e.machineName },
-    }))
-  );
+  const rolling = stats.rollingAverage;
 
   const chartH = 120;
   const barW = 28;
@@ -99,10 +91,10 @@ export default function ScoreChart({ scores, stats }: Props) {
             ))}
 
             {sorted.map((entry, i) => {
-              const h = Math.max(4, (Number(entry.formattedScore) / stats.high) * chartH);
+              const h = Math.max(4, (entry.rawScore / stats.high) * chartH);
               const x = i * gap + 16;
-              const isHigh = Number(entry.formattedScore) === stats.high;
-              const isLow = Number(entry.formattedScore) === stats.low;
+              const isHigh = entry.rawScore === stats.high;
+              const isLow = entry.rawScore === stats.low;
               const fill = isHigh ? '#f0c84a' : isLow ? '#804020' : 'rgba(192,160,96,0.55)';
 
               return (

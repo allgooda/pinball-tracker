@@ -2,21 +2,18 @@
 // shows how the floor score has trended over time as more games are logged
 
 import { useState } from 'react';
-import type { ScoreEntry } from '../types';
-import { dailyFloor } from '../utils/stats';
+import type { MachineStats } from '../types';
 import { formatScore } from '../utils/format';
 
 interface Props {
-  scores: ScoreEntry[];
+  stats: MachineStats;
 }
 
-export default function FloorChart({ scores }: Props) {
+export default function FloorChart({ stats }: Props) {
 
   const [visible, setVisible] = useState<boolean>(true);
 
-  if (scores.length < 4) return null;
-
-  const data = dailyFloor(scores);
+  const data = stats.dailyFloor;
   const floors = data.map((d) => d.floor);
   const dates = data.map((d) => d.date);
 

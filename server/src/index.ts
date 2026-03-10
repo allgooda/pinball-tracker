@@ -2,7 +2,8 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import pool, { initDb } from './db';
-import type { MachineRow, ScoreRow, AddMachineBody, AddScoreBody } from './types';
+import type { MachineRow, ScoreRow, AddMachineBody, AddScoreBody, Machine } from './types';
+import { calculateStats } from './stats';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -18,6 +19,19 @@ app.get('/machines', async (req: Request, res: Response) => {
   res.json(result.rows);
 });
 
+app.get('/machines/:id', async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  const machineResult = await pool.query<MachineRow>('SELECT * FROM machines WHERE id = $1', [id]);
+  if (machineResult.rows.length === 0) {
+    res.status(404).json({ error: 'Machine not found' });
+    return;
+  }
+  const m = machineResult.rows[0];
+  const scoresResult = await pool.query<ScoreRow>('SELECT * FROM scores WHERE machine_id = $1', [id]);
+  const machine: Machine = { id: m.id, name: m.name, stats: calculateStats(scoresResult.rows) };
+  res.json(machine);
+});
+
 app.post('/machines', async (req: Request<{}, {}, AddMachineBody>, res: Response) => {
   const { name } = req.body;
   if (!name) {
@@ -28,7 +42,8 @@ app.post('/machines', async (req: Request<{}, {}, AddMachineBody>, res: Response
     'INSERT INTO machines (name) VALUES ($1) RETURNING *',
     [name]
   );
-  res.json(result.rows[0]);
+  const m = result.rows[0];
+  res.json({ id: m.id, name: m.name, stats: null });
 });
 
 app.delete('/machines/:id', async (req: Request<{ id: string }>, res: Response) => {
