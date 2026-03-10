@@ -1,8 +1,11 @@
 // ScoreList.tsx
 // shows all games for the active machine, newest first
 
+import { useState } from 'react';
 import type { MachineStats } from '../types';
 import type { DisplayScoreEntry, DisplayScoreId } from '../utils/display';
+
+const PAGE_SIZE = 10;
 
 interface Props {
   scores: DisplayScoreEntry[];
@@ -65,6 +68,8 @@ function ScoreRow({ entry, isHigh, isLow, onRemove }: RowProps) {
 
 export default function ScoreList({ scores, stats, onRemove }: Props) {
 
+  const [page, setPage] = useState<number>(0);
+
   if (scores.length === 0) {
     return (
       <div style={{ padding: '48px 0', color: '#604820', fontSize: 14, textAlign: 'center' }}>
@@ -77,6 +82,9 @@ export default function ScoreList({ scores, stats, onRemove }: Props) {
     (a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime()
   );
 
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div style={{ marginTop: 32 }}>
 
@@ -85,7 +93,7 @@ export default function ScoreList({ scores, stats, onRemove }: Props) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {sorted.map((entry) => (
+        {paginated.map((entry) => (
           <ScoreRow
             key={entry.id}
             entry={entry}
@@ -95,6 +103,48 @@ export default function ScoreList({ scores, stats, onRemove }: Props) {
           />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
+          <button
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page === 0}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(192,160,96,0.3)',
+              borderRadius: 6,
+              padding: '6px 14px',
+              color: page === 0 ? '#3a2a10' : '#806030',
+              cursor: page === 0 ? 'default' : 'pointer',
+              fontFamily: 'Georgia, serif',
+              fontSize: 13,
+            }}
+          >
+            ←
+          </button>
+
+          <div style={{ fontSize: 11, color: '#604820' }}>
+            {page + 1} / {totalPages}
+          </div>
+
+          <button
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page === totalPages - 1}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(192,160,96,0.3)',
+              borderRadius: 6,
+              padding: '6px 14px',
+              color: page === totalPages - 1 ? '#3a2a10' : '#806030',
+              cursor: page === totalPages - 1 ? 'default' : 'pointer',
+              fontFamily: 'Georgia, serif',
+              fontSize: 13,
+            }}
+          >
+            →
+          </button>
+        </div>
+      )}
 
     </div>
   );
