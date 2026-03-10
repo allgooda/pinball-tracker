@@ -22,7 +22,7 @@ export default function AddMachineForm({ onAdd }: Props) {
 
     // optimistically create the machine and pass it up
     // the parent will handle the actual API call
-    onAdd({ id: 0 as any, name: name.trim() });
+    onAdd({ id: 0 as any, name: name.trim(), stats: null });
     setName('');
     setError('');
     setOpen(false);
