@@ -1,0 +1,29 @@
+:root {
+  --bg: #0d0a05;
+  --card-bg: #1a1005;
+  --gold: #f0c84a;
+  --gold-dim: rgba(192, 160, 96, 0.2);
+  --gold-border: rgba(192, 160, 96, 0.3);
+  --gold-border-strong: rgba(192, 160, 96, 0.5);
+  --gold-active-bg: rgba(240, 200, 74, 0.18);
+  --gold-active-border: rgba(240, 200, 74, 0.6);
+  --text: #e8d5a0;
+  --brown-md: #806030;
+  --brown-dk: #604820;
+  --brown-dkr: #503020;
+  --brown-darkest: #3a2a10;
+  --red-dim: rgba(180, 60, 40, 0.2);
+  --red-border: rgba(180, 60, 40, 0.5);
+  --red-text: #d08060;
+  --green-dim: rgba(80, 160, 80, 0.3);
+  --green-border: rgba(80, 200, 80, 0.5);
+  --green-text: #80d080;
+  --blue: #4a90c8;
+  --blue-light: #6ab0d8;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-faint: rgba(255, 255, 255, 0.07);
+  --border-dim: rgba(255, 255, 255, 0.1);
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-sm: rgba(255, 255, 255, 0.04);
+  --font: Georgia, serif;
+}

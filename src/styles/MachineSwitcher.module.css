@@ -1,0 +1,101 @@
+.switcher {
+  display: flex;
+  gap: 10px;
+}
+
+.machine {
+  display: flex;
+  align-items: center;
+  background: var(--surface-sm);
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.machineActive {
+  background: var(--gold-active-bg);
+  border-color: var(--gold-active-border);
+}
+
+.selectBtn {
+  background: none;
+  border: none;
+  padding: 9px 16px;
+  color: var(--brown-md);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--font);
+  letter-spacing: 1px;
+}
+
+.selectBtnActive {
+  color: var(--gold);
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border-subtle);
+  padding: 9px 10px;
+  color: var(--brown-dkr);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--gold-border);
+  border-radius: 8px;
+  padding: 28px 32px;
+  max-width: 340px;
+  font-family: var(--font);
+}
+
+.modalTitle {
+  color: var(--text);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.modalSubtitle {
+  color: var(--brown-dk);
+  font-size: 12px;
+  margin-bottom: 24px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirmBtn {
+  background: var(--red-dim);
+  border: 1px solid var(--red-border);
+  border-radius: 6px;
+  padding: 8px 20px;
+  color: var(--red-text);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  padding: 8px 20px;
+  color: var(--brown-md);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font);
+}

@@ -4,45 +4,27 @@
 import type { MachineStats } from '../types';
 import { formatScore } from '../utils/format';
 import { MILESTONES } from '../data/constants';
+import styles from '../styles/MilestoneTracker.module.css';
 
 interface Props {
   stats: MachineStats;
 }
 
 export default function MilestoneTracker({ stats }: Props) {
-
   return (
-    <div style={{ marginTop: 28 }}>
-
-      <div style={{ fontSize: 11, color: '#806030', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>
-        milestones
-      </div>
-
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+    <div className={styles.section}>
+      <div className={styles.label}>milestones</div>
+      <div className={styles.badges}>
         {MILESTONES.map((m) => {
-
           const count = stats.milestoneHits[m];
           const hit = count > 0;
-
           return (
-            <div
-              key={m}
-              style={{
-                padding: '7px 14px',
-                borderRadius: 20,
-                background: hit ? 'rgba(240,200,74,0.15)' : 'rgba(255,255,255,0.03)',
-                border: hit ? '1px solid rgba(240,200,74,0.4)' : '1px solid rgba(255,255,255,0.07)',
-                fontSize: 12,
-                color: hit ? '#f0c84a' : '#504030',
-                letterSpacing: 1,
-              }}
-            >
+            <div key={m} className={`${styles.badge} ${hit ? styles.badgeHit : ''}`}>
               {formatScore(m)} {hit ? `×${count}` : ''}
             </div>
           );
         })}
       </div>
-
     </div>
   );
 }

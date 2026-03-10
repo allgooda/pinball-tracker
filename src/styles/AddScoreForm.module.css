@@ -1,0 +1,67 @@
+.section {
+  margin-top: 32px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--brown-md);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.input {
+  background: var(--surface);
+  border: 1px solid var(--gold-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 15px;
+  width: 180px;
+  font-family: var(--font);
+  outline: none;
+}
+
+.dateInput {
+  background: var(--surface);
+  border: 1px solid var(--gold-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font);
+  outline: none;
+  color-scheme: dark;
+}
+
+.submitBtn {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border-strong);
+  border-radius: 6px;
+  padding: 10px 22px;
+  color: var(--gold);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--font);
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.submitBtnAdded {
+  background: var(--green-dim);
+  border-color: var(--green-border);
+  color: var(--green-text);
+}
+
+.error {
+  color: #d06040;
+  font-size: 12px;
+  margin-top: 6px;
+}

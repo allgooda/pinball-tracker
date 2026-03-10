@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import type { MachineStats } from '../types';
 import { formatScore } from '../utils/format';
+import styles from '../styles/FloorChart.module.css';
 
 interface Props {
   stats: MachineStats;
@@ -19,7 +20,6 @@ export default function FloorChart({ stats }: Props) {
 
   const max = Math.max(...floors);
   const min = Math.min(...floors);
-
   const range = max - min || 1;
   const padded = range * 0.2;
   const chartMax = max + padded;
@@ -32,43 +32,25 @@ export default function FloorChart({ stats }: Props) {
 
   const toY = (val: number) => chartH - ((val - chartMin) / chartRange) * chartH;
 
-  const linePath = floors
-    .map((val, i) => `${i * gap + 30},${toY(val)}`)
-    .join(' ');
+  const linePath = floors.map((val, i) => `${i * gap + 30},${toY(val)}`).join(' ');
 
   const latest = floors[floors.length - 1];
   const prev = floors[floors.length - 2];
   const trending = prev !== undefined ? latest >= prev : true;
 
   return (
-    <div style={{ marginTop: 28 }}>
-
-      <div
-        onClick={() => setVisible((v) => !v)}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginBottom: 10 }}
-      >
-        <div style={{ fontSize: 11, color: '#806030', textTransform: 'uppercase', letterSpacing: 2 }}>
-          floor trend
-        </div>
-        <div style={{ fontSize: 12, color: trending ? '#80d080' : '#d08080' }}>
+    <div className={styles.section}>
+      <div className={styles.toggle} onClick={() => setVisible((v) => !v)}>
+        <div className={styles.toggleLabel}>floor trend</div>
+        <div className={`${styles.toggleTrend} ${trending ? styles.toggleTrendUp : styles.toggleTrendDown}`}>
           {trending ? '↑' : '↓'} {formatScore(latest)}
         </div>
-        <div style={{ fontSize: 10, color: '#604820' }}>
-          {visible ? '▲ hide' : '▼ show'}
-        </div>
+        <div className={styles.toggleHint}>{visible ? '▲ hide' : '▼ show'}</div>
       </div>
 
       {visible && (
-        <div style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: 8,
-          padding: '16px 16px 8px',
-          overflowX: 'auto',
-        }}>
-
+        <div className={styles.chart}>
           <svg width={width} height={chartH + 30} style={{ display: 'block' }}>
-
             {[0.25, 0.5, 0.75, 1].map((f) => (
               <line
                 key={f}
@@ -79,57 +61,29 @@ export default function FloorChart({ stats }: Props) {
               />
             ))}
 
-            <polyline
-              points={linePath}
-              fill="none"
-              stroke="#804020"
-              strokeWidth={2}
-              opacity={0.9}
-            />
+            <polyline points={linePath} fill="none" stroke="#804020" strokeWidth={2} opacity={0.9} />
 
             {floors.map((val, i) => (
               <g key={i}>
-                <circle
-                  cx={i * gap + 30}
-                  cy={toY(val)}
-                  r={3}
-                  fill="#804020"
-                  opacity={0.9}
-                />
-                <text
-                  x={i * gap + 30}
-                  y={toY(val) - 8}
-                  textAnchor="middle"
-                  fontSize={9}
-                  fill="#a06040"
-                >
+                <circle cx={i * gap + 30} cy={toY(val)} r={3} fill="#804020" opacity={0.9} />
+                <text x={i * gap + 30} y={toY(val) - 8} textAnchor="middle" fontSize={9} fill="#a06040">
                   {formatScore(val)}
                 </text>
               </g>
             ))}
 
             {dates.map((date, i) => (
-              <text
-                key={date}
-                x={i * gap + 30}
-                y={chartH + 16}
-                textAnchor="middle"
-                fontSize={9}
-                fill="#604820"
-              >
+              <text key={date} x={i * gap + 30} y={chartH + 16} textAnchor="middle" fontSize={9} fill="#604820">
                 {date.slice(5)}
               </text>
             ))}
-
           </svg>
 
-          <div style={{ fontSize: 10, color: '#604820', marginTop: 4 }}>
+          <div className={styles.legend}>
             floor = average of your bottom 25% of games at each point in time
           </div>
-
         </div>
       )}
-
     </div>
   );
 }

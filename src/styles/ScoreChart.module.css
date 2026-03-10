@@ -1,0 +1,39 @@
+.section {
+  margin-top: 28px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.toggleLabel {
+  font-size: 11px;
+  color: var(--brown-md);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.toggleHint {
+  font-size: 10px;
+  color: var(--brown-dk);
+}
+
+.chart {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 16px 16px 8px;
+  overflow-x: auto;
+}
+
+.legend {
+  font-size: 10px;
+  color: var(--brown-dk);
+  margin-top: 4px;
+  display: flex;
+  gap: 16px;
+}

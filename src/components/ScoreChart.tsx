@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import type { MachineStats } from '../types';
 import type { DisplayScoreEntry } from '../utils/display';
+import styles from '../styles/ScoreChart.module.css';
 
 interface Props {
   scores: DisplayScoreEntry[];
@@ -48,38 +49,21 @@ export default function ScoreChart({ scores, stats }: Props) {
   );
 
   const rolling = stats.rollingAverage;
-
   const chartH = 120;
   const barW = 28;
   const gap = 48;
   const width = Math.max(500, sorted.length * gap);
 
   return (
-    <div style={{ marginTop: 28 }}>
-
-      <div
-        onClick={() => setVisible((v) => !v)}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginBottom: 10 }}
-      >
-        <div style={{ fontSize: 11, color: '#806030', textTransform: 'uppercase', letterSpacing: 2 }}>
-          score history
-        </div>
-        <div style={{ fontSize: 10, color: '#604820' }}>
-          {visible ? '▲ hide' : '▼ show'}
-        </div>
+    <div className={styles.section}>
+      <div className={styles.toggle} onClick={() => setVisible((v) => !v)}>
+        <div className={styles.toggleLabel}>score history</div>
+        <div className={styles.toggleHint}>{visible ? '▲ hide' : '▼ show'}</div>
       </div>
 
       {visible && (
-        <div style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: 8,
-          padding: '16px 16px 8px',
-          overflowX: 'auto',
-        }}>
-
+        <div className={styles.chart}>
           <svg width={width} height={chartH + 30} style={{ display: 'block' }}>
-
             {[0.25, 0.5, 0.75, 1].map((f) => (
               <line
                 key={f}
@@ -96,7 +80,6 @@ export default function ScoreChart({ scores, stats }: Props) {
               const isHigh = entry.rawScore === stats.high;
               const isLow = entry.rawScore === stats.low;
               const fill = isHigh ? '#f0c84a' : isLow ? '#804020' : 'rgba(192,160,96,0.55)';
-
               return (
                 <g key={entry.id}>
                   <rect x={x} y={chartH - h} width={barW} height={h} fill={fill} rx={3} />
@@ -107,27 +90,16 @@ export default function ScoreChart({ scores, stats }: Props) {
               );
             })}
 
-            <TrendLine
-              points={rolling}
-              max={stats.high}
-              chartH={chartH}
-              gap={gap}
-              color="#f0c84a"
-              dash="4 3"
-              opacity={0.6}
-            />
-
+            <TrendLine points={rolling} max={stats.high} chartH={chartH} gap={gap} color="#f0c84a" dash="4 3" opacity={0.6} />
           </svg>
 
-          <div style={{ fontSize: 10, color: '#604820', marginTop: 4, display: 'flex', gap: 16 }}>
+          <div className={styles.legend}>
             <span><span style={{ color: '#f0c84a' }}>— —</span> rolling avg</span>
             <span><span style={{ color: '#f0c84a' }}>█</span> high</span>
             <span><span style={{ color: '#804020' }}>█</span> low</span>
           </div>
-
         </div>
       )}
-
     </div>
   );
 }

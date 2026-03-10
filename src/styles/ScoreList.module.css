@@ -1,0 +1,105 @@
+.section {
+  margin-top: 32px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--brown-md);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+
+.rowHigh {
+  background: rgba(240, 200, 74, 0.08);
+  border-color: rgba(240, 200, 74, 0.25);
+}
+
+.score {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text);
+  min-width: 80px;
+}
+
+.scoreHigh {
+  color: var(--gold);
+}
+
+.date {
+  font-size: 11px;
+  color: var(--brown-dk);
+  flex: 1;
+}
+
+.badge {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.badgeHigh {
+  color: var(--gold);
+}
+
+.badgeLow {
+  color: #804020;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--brown-dkr);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.empty {
+  padding: 48px 0;
+  color: var(--brown-dk);
+  font-size: 14px;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pageBtn {
+  background: none;
+  border: 1px solid var(--gold-border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: var(--brown-md);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.pageBtnDisabled {
+  color: var(--brown-darkest);
+  cursor: default;
+}
+
+.pageIndicator {
+  font-size: 11px;
+  color: var(--brown-dk);
+}

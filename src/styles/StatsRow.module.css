@@ -1,0 +1,44 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.card {
+  background: var(--surface-sm);
+  border: 1px solid var(--border-faint);
+  border-radius: 8px;
+  padding: 14px 14px 12px;
+  text-align: center;
+}
+
+.cardHighlight {
+  background: rgba(192, 160, 96, 0.12);
+  border-color: rgba(192, 160, 96, 0.4);
+}
+
+.value {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--text);
+  letter-spacing: 1px;
+}
+
+.valueHighlight {
+  color: var(--gold);
+}
+
+.label {
+  font-size: 10px;
+  color: var(--brown-md);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+}
+
+.sub {
+  font-size: 10px;
+  color: var(--brown-dk);
+  margin-top: 2px;
+}
