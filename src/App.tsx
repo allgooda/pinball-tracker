@@ -135,12 +135,13 @@ export default function App() {
       </div>
 
       {stats && <StatsRow stats={stats} />}
+
+      {activeMachine && <AddScoreForm activeMachine={activeMachine} onAdd={handleAddScore} />}
+
       {stats && <MilestoneTracker stats={stats} />}
       {stats && <ScoreChart scores={toDisplayScoreEntries(activeScores)} stats={stats} />}
       {stats && stats.dailyFloor.length >= 4 && <FloorChart stats={stats} />}
       {stats && stats.dailyMedian.length >= 4 && <MedianChart stats={stats} />}
-
-      {activeMachine && <AddScoreForm activeMachine={activeMachine} onAdd={handleAddScore} />}
 
       {stats && (
         <ScoreList
