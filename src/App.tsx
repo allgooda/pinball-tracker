@@ -43,7 +43,10 @@ export default function App() {
     if (!activeMachine) return;
     getAccessTokenSilently().then((token) => {
       fetchScores(activeMachine, token).then((data) => setScores(data));
-      fetchMachine(activeMachine.id, token).then((data) => setActiveMachine(data));
+      fetchMachine(activeMachine.id, token).then((data) => {
+        setActiveMachine(data);
+        setMachines((prev) => prev.map((m) => m.id === data.id ? data : m));
+      });
     });
   }, [activeMachine?.id]);
 
